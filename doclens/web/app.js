@@ -1,3 +1,5 @@
+import { loadChats, removeChat, saveChat } from "./chat-storage.js";
+
 const $ = (id) => document.getElementById(id);
 const SVG = "http://www.w3.org/2000/svg";
 const labels = { assistant: "Assistant", retrieval: "Retrieval lab", library: "Source library" };
@@ -9,7 +11,14 @@ const topics = {
 };
 const methodNames = { bm25: "BM25", dense: "Dense vectors", hybrid: "Hybrid (RRF)", reranked: "Hybrid + rerank" };
 const generationNames = { extractive: "Local excerpts", ollama: "Ollama", openai: "Hosted model" };
-const state = { view: "", topic: "", sources: null, health: null, libraryError: false, requests: {} };
+const stored = loadChats();
+const state = { view: "", topic: "", sources: null, health: null, libraryError: false, searchRequest: null };
+const chats = stored.chats;
+const pending = new Map();
+const drafts = new Map();
+const unsaved = new Set();
+let activeChatId = "";
+let managedChatId = "";
 
 function element(tag, className, content) {
   const node = document.createElement(tag);
@@ -48,7 +57,7 @@ function externalLink(url, className, content) {
 }
 
 function appendInline(parent, text, citations = new Map()) {
-  const tokens = /§([^§\n]+)§|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*|\[(\d+)\]/g;
+  const tokens = /`([^`\n]+)`|\*\*([^*\n]+)\*\*|\*([^*\n]+)\*|\[(\d+)\]/g;
   let offset = 0;
   for (const match of text.matchAll(tokens)) {
     parent.append(text.slice(offset, match.index));
@@ -73,7 +82,7 @@ function appendInline(parent, text, citations = new Map()) {
 function markdown(text, citations = new Map()) {
   const result = document.createDocumentFragment();
   const lines = text.split("\n");
-  const fence = /^\s*§§§[\w+-]*\s*$/;
+  const fence = /^\s*```[\w+-]*\s*$/;
   const unordered = /^\s*[-*+]\s+(.+)/;
   const ordered = /^\s*\d+\.\s+(.+)/;
 
@@ -82,7 +91,7 @@ function markdown(text, citations = new Map()) {
     if (!line.trim()) continue;
     if (fence.test(line)) {
       const code = [];
-      while (++i < lines.length && !/^\s*§§§\s*$/.test(lines[i])) code.push(lines[i]);
+      while (++i < lines.length && !/^\s*```\s*$/.test(lines[i])) code.push(lines[i]);
       const block = element("pre");
       block.tabIndex = 0;
       block.append(element("code", "", code.join("\n")));
@@ -145,47 +154,50 @@ function setMenu(open, restoreFocus = true) {
   else if (restoreFocus && smallScreen.matches) $("menu-button").focus();
 }
 
+function chatRoute(id = "") {
+  return id ? "#assistant/" + id : "#assistant";
+}
+
 function navigate() {
   const [name, filter] = location.hash.slice(1).split("/");
   if (name === "main-content" && state.view) return;
   const view = Object.hasOwn(labels, name) ? name : "assistant";
-  const topic = view === "library" && Object.hasOwn(topics, filter) ? filter : "";
   const changed = state.view !== view;
   state.view = view;
-  state.topic = topic;
-  $("page-label").textContent = labels[view];
-  document.title = "DocLens · " + (view === "assistant" ? "AI Engineering Assistant" : labels[view]);
+  state.topic = view === "library" && Object.hasOwn(topics, filter) ? filter : "";
+  document.querySelector(".workspace").classList.toggle("is-chat", view === "assistant");
+  for (const key of Object.keys(labels)) $("view-" + key).hidden = key !== view;
   document.querySelectorAll("[data-view]").forEach((link) => {
     if (link.dataset.view === view) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   });
-  document.querySelectorAll("[data-topic]").forEach((link) => {
-    link.classList.toggle("is-active", view === "library" && link.dataset.topic === topic);
-  });
-  for (const key of Object.keys(labels)) $("view-" + key).hidden = key !== view;
+
   const hadOpenMenu = $("sidebar").classList.contains("is-open");
   setMenu(false, false);
-  if (view === "library") renderLibrary();
+  if (view === "assistant") {
+    const selected = chats.has(filter) ? filter : "";
+    if (selected !== activeChatId || changed) {
+      activeChatId = selected;
+      restoreDraft();
+    }
+    renderChat(changed || selected !== $("chat-thread").dataset.chat);
+  } else {
+    $("page-label").textContent = labels[view];
+    $("page-label").removeAttribute("title");
+    document.title = "DocLens · " + labels[view];
+    if (view === "library") renderLibrary();
+  }
+  renderHistory();
   if (changed) window.scrollTo(0, 0);
   if (hadOpenMenu) $("main-content").focus();
 }
 
-function resetAssistant() {
-  const active = state.requests.ask;
-  if (active) {
-    delete state.requests.ask;
-    active.abort();
-  }
-  $("ask-form").reset();
-  $("ask-submit").disabled = false;
-  $("ask-submit").removeAttribute("aria-busy");
-  $("assistant-hero").hidden = false;
-  $("suggestions").hidden = false;
-  $("ask-output").hidden = true;
-  $("ask-output").replaceChildren();
-  location.hash = "assistant";
+function newChat() {
+  drafts.delete("");
+  $("history-query").value = "";
+  location.hash = chatRoute();
   navigate();
-  window.scrollTo(0, 0);
+  restoreDraft();
   $("ask-question").focus();
 }
 
@@ -234,37 +246,40 @@ function copyButton(answer) {
 
 function citationPanel(citations) {
   const panel = element("aside", "citation-panel");
-  panel.append(element("h3", "", "Sources cited"));
+  const links = element("div", "citation-links");
+  panel.append(element("h3", "", "Sources cited"), links);
   for (const citation of citations) {
     const link = externalLink(citation.url, "citation-link");
-    const copy = element("span", "citation-copy");
-    copy.append(element("strong", "", citation.title), element("small", "", citation.heading.at(-1) || citation.version));
-    link.append(element("span", "citation-number", String(citation.number)), copy, icon("arrow-up-right"));
-    panel.append(link);
+    link.title = citation.heading.at(-1) || citation.version;
+    link.append(
+      element("span", "citation-number", String(citation.number)),
+      element("span", "citation-copy", citation.title),
+      icon("arrow-up-right"),
+    );
+    links.append(link);
   }
   return panel;
 }
 
-function answerResult(root, data, query, topic) {
-  const title = element("h2", "question-title", query);
-  const layout = element("div", "answer-layout");
+function answerCard(turn) {
+  const data = turn.result;
   const card = element("article", "answer-card");
   const heading = element("div", "answer-head");
   const answerLabel = element("div", "answer-label");
+  const avatar = element("span", "brand-icon");
+  avatar.append(icon("logo"));
   const name = element("div");
   name.append(
-    element("h3", "", data.abstained ? "Insufficient evidence" : "DocLens answer"),
+    element("h2", "", data.abstained ? "Insufficient evidence" : "DocLens"),
     element("p", "answer-mode", generationNames[data.generation] || data.generation),
   );
-  answerLabel.append(topicIcon("", data.abstained ? "alert" : "sparkles"), name);
+  answerLabel.append(avatar, name);
   heading.append(answerLabel, copyButton(data.answer));
   const content = element("div", "answer-body");
   content.append(markdown(data.answer, new Map(data.citations.map((cite) => [cite.number, cite]))));
   card.append(heading, content);
   if (data.note) card.append(element("p", "notice", data.note));
-  layout.append(card);
-  if (data.citations.length) layout.append(citationPanel(data.citations));
-  root.replaceChildren(title, layout);
+  if (data.citations.length) card.append(citationPanel(data.citations));
   if (data.evidence.length) {
     const detail = element("details", "answer-evidence");
     const openLab = element("button", "link-button", "Open in retrieval lab");
@@ -272,16 +287,318 @@ function answerResult(root, data, query, topic) {
     openLab.append(icon("arrow-up-right"));
     openLab.addEventListener("click", () => {
       $("search-question").setCustomValidity("");
-      $("search-question").value = query;
-      $("search-topic").value = topic;
+      $("search-question").value = (data.retrieval_query || turn.question).replace(/\s+/g, " ");
+      $("search-topic").value = turn.topic || "";
       $("search-mode").value = data.mode;
       location.hash = "retrieval";
       navigate();
       $("search-form").requestSubmit();
     });
-    detail.append(element("summary", "", "Inspect retrieved passages · " + data.evidence.length), openLab, passageList(data.evidence));
-    root.append(detail);
+    detail.append(element("summary", "", "Inspect retrieved passages · " + data.evidence.length), openLab);
+    detail.addEventListener("toggle", () => {
+      if (detail.open && !detail.querySelector(".evidence-list")) detail.append(passageList(data.evidence));
+    });
+    card.append(detail);
   }
+  return card;
+}
+
+function updateStorageStatus() {
+  const status = $("history-error");
+  status.hidden = stored.available && !unsaved.size;
+  status.textContent = status.hidden ? "" : "Some chats could not be saved in this browser.";
+  $("chat-footer").textContent = status.hidden ? "Chats are saved in this browser." : "History storage is unavailable for some chats.";
+}
+
+function persist(chat) {
+  try {
+    saveChat(chat);
+    stored.available = true;
+    unsaved.delete(chat.id);
+  } catch {
+    unsaved.add(chat.id);
+  }
+  updateStorageStatus();
+}
+
+function renderHistory() {
+  const filter = $("history-query").value.trim().toLowerCase();
+  $("history-search").hidden = chats.size === 0;
+  const list = $("history-list");
+  const previousScroll = list.scrollTop;
+  const rows = [];
+  const sorted = [...chats.values()].sort((a, b) => b.updatedAt - a.updatedAt);
+  for (const chat of sorted) {
+    if (filter && !chat.title.toLowerCase().includes(filter) &&
+      !chat.turns.some((turn) => turn.question.toLowerCase().includes(filter) ||
+        turn.result?.answer.toLowerCase().includes(filter))) continue;
+    const isCurrent = state.view === "assistant" && activeChatId === chat.id;
+    const row = element("li", isCurrent ? "history-row is-active" : "history-row");
+    const link = element("a", "history-link");
+    link.href = chatRoute(chat.id);
+    if (isCurrent) link.setAttribute("aria-current", "page");
+    link.title = chat.title;
+    link.append(icon("chat"), element("span", "", chat.title));
+    const more = element("button", "icon-button history-menu");
+    more.type = "button";
+    more.dataset.manageId = chat.id;
+    more.setAttribute("aria-label", "Manage chat: " + chat.title);
+    more.title = "Chat options";
+    more.append(icon("more"));
+    more.addEventListener("click", () => manageChat(chat));
+    row.append(link, more);
+    rows.push(row);
+  }
+  $("history-empty").hidden = rows.length > 0;
+  $("history-empty").textContent = filter ? "No matching conversations." : "Your conversations will appear here.";
+  list.replaceChildren(...rows);
+  list.scrollTop = previousScroll;
+  document.querySelector('[data-view="assistant"]').href = chatRoute(activeChatId);
+  document.querySelector(".brand").href = chatRoute(activeChatId);
+}
+
+function reserveId() {
+  return globalThis.crypto.randomUUID?.() ?? Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+}
+
+function adjustComposer() {
+  const input = $("ask-question");
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 160) + "px";
+  $("ask-submit").disabled = input.value.trim().length < 2;
+}
+
+function preserveDraft() {
+  const input = $("ask-question");
+  input.setCustomValidity("");
+  drafts.set(activeChatId, { text: input.value, topic: $("ask-topic").value });
+  adjustComposer();
+}
+
+function restoreDraft() {
+  const draft = drafts.get(activeChatId);
+  const input = $("ask-question");
+  input.setCustomValidity("");
+  input.value = draft?.text || "";
+  $("ask-topic").value = draft?.topic ?? chats.get(activeChatId)?.turns.at(-1)?.topic ?? "";
+  adjustComposer();
+}
+
+function makeTurn(chat, turn, kind, retryable) {
+  const row = element("li", "chat-turn");
+  row.dataset.id = turn.id;
+  row.dataset.kind = kind;
+  row.dataset.retryable = String(retryable);
+  const question = element("div", "user-message");
+  question.append(element("span", "visually-hidden", "You: "), element("span", "", turn.question));
+  row.append(question);
+  if (kind === "ready") {
+    row.append(answerCard(turn));
+  } else if (kind === "pending") {
+    row.append(message("Searching the documentation", "Finding passages in the indexed sources…", "loading"));
+  } else {
+    const problem = turn.error === "stopped" ? "Response stopped" : "Response unavailable";
+    const details = turn.error === "failed" ? "The API couldn’t finish this request." : "Your question is still in this chat.";
+    const failure = message(problem, details, "error");
+    if (retryable) {
+      const retry = element("button", "link-button", "Try again");
+      retry.type = "button";
+      retry.addEventListener("click", () => requestAnswer(chat, turn));
+      failure.lastElementChild.append(retry);
+    }
+    row.append(failure);
+  }
+  return row;
+}
+
+function renderChat(scrollToEnd = false) {
+  if (state.view !== "assistant") return;
+  const chat = chats.get(activeChatId);
+  const title = chat?.title || "New chat";
+  $("page-label").textContent = title;
+  $("page-label").title = title;
+  document.title = "DocLens · " + title;
+  const scroll = $("chat-scroll");
+  const nearEnd = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 130;
+  const thread = $("chat-thread");
+  if (thread.dataset.chat !== (chat?.id || "")) {
+    thread.dataset.chat = chat?.id || "";
+    thread.replaceChildren();
+  }
+  $("view-assistant").classList.toggle("has-thread", Boolean(chat));
+  $("chat-welcome").hidden = Boolean(chat);
+  $("suggestions").hidden = Boolean(chat);
+  thread.hidden = !chat;
+  scroll.tabIndex = chat ? 0 : -1;
+  $("ask-question").placeholder = chat ? "Ask a follow-up…" : "Ask a question about the docs…";
+
+  const running = pending.get(activeChatId);
+  $("ask-submit").hidden = Boolean(running);
+  $("ask-stop").hidden = !running;
+  if (!chat) return;
+
+  const entries = new Map(Array.from(thread.children, (node) => [node.dataset.id, node]));
+  for (const turn of chat.turns) {
+    const retryable = !turn.result && !running && turn === chat.turns.at(-1);
+    const kind = turn.result ? "ready" : running?.turnId === turn.id ? "pending" : turn.error || "interrupted";
+    const existing = entries.get(turn.id);
+    if (existing?.dataset.kind === kind && existing.dataset.retryable === String(retryable)) continue;
+    const row = makeTurn(chat, turn, kind, retryable);
+    if (existing) existing.replaceWith(row);
+    else thread.append(row);
+  }
+  if (scrollToEnd || nearEnd) scroll.scrollTop = scroll.scrollHeight;
+}
+
+function questionValue(input) {
+  const question = input.value.trim();
+  if (question.length >= 2) return question;
+  input.setCustomValidity("Enter at least two characters.");
+  input.reportValidity();
+  return "";
+}
+
+function submitChat(event) {
+  event.preventDefault();
+  if (pending.has(activeChatId)) return;
+  const question = questionValue($("ask-question"));
+  if (!question) return;
+  let chat = chats.get(activeChatId);
+  if (!chat) {
+    const summary = Array.from(question.replace(/\s+/g, " "));
+    const title = summary.length > 68 ? summary.slice(0, 67).join("").trimEnd() + "…" : summary.join("");
+    chat = { id: reserveId(), title, updatedAt: Date.now(), turns: [] };
+    chats.set(chat.id, chat);
+    drafts.delete("");
+    activeChatId = chat.id;
+    history.replaceState(null, "", chatRoute(chat.id));
+  }
+  const turn = { id: reserveId(), question, topic: $("ask-topic").value, result: null, error: null };
+  chat.turns.push(turn);
+  chat.updatedAt = Date.now();
+  drafts.delete(chat.id);
+  persist(chat);
+  restoreDraft();
+  renderHistory();
+  requestAnswer(chat, turn);
+  $("ask-question").focus({ preventScroll: true });
+}
+
+async function requestAnswer(chat, turn) {
+  if (pending.has(chat.id)) return;
+  const request = { controller: new AbortController(), turnId: turn.id };
+  pending.set(chat.id, request);
+  turn.error = null;
+  if (activeChatId === chat.id) renderChat(true);
+  const previous = chat.turns.slice(0, chat.turns.indexOf(turn))
+    .filter((entry) => entry.result && !entry.result.abstained)
+    .slice(-6)
+    .map((entry) => ({ question: entry.question, answer: Array.from(entry.result.answer).slice(0, 2500).join("") }));
+  try {
+    const result = await postQuery("/ask", {
+      question: turn.question, topic: turn.topic || null, history: previous,
+    }, request.controller.signal);
+    if (pending.get(chat.id) !== request) return;
+    turn.result = result;
+  } catch {
+    if (pending.get(chat.id) !== request) return;
+    turn.error = "failed";
+  } finally {
+    if (pending.get(chat.id) === request) {
+      pending.delete(chat.id);
+      persist(chat);
+      if ($("history-query").value) renderHistory();
+      if (activeChatId === chat.id) renderChat();
+    }
+  }
+}
+
+function stopResponse() {
+  const running = pending.get(activeChatId);
+  if (!running) return;
+  pending.delete(activeChatId);
+  running.controller.abort();
+  const chat = chats.get(activeChatId);
+  chat.turns.find((turn) => turn.id === running.turnId).error = "stopped";
+  persist(chat);
+  renderChat();
+  $("ask-question").focus({ preventScroll: true });
+}
+
+function manageChat(chat) {
+  managedChatId = chat.id;
+  $("chat-name").value = chat.title;
+  $("chat-name").setCustomValidity("");
+  $("manage-title").textContent = "Rename chat";
+  $("rename-chat").hidden = false;
+  $("delete-chat").hidden = true;
+  $("manage-chat").showModal();
+  $("chat-name").select();
+}
+
+function finishManage(focusChat = true) {
+  const id = managedChatId;
+  $("manage-chat").close();
+  managedChatId = "";
+  if (focusChat) document.querySelector('[data-manage-id="' + id + '"]')?.focus();
+}
+
+function renameChat(event) {
+  event.preventDefault();
+  const chat = chats.get(managedChatId);
+  if (!chat) return;
+  const title = $("chat-name").value.trim();
+  if (!title) {
+    $("chat-name").setCustomValidity("Enter a chat name.");
+    $("chat-name").reportValidity();
+    return;
+  }
+  chat.title = title;
+  persist(chat);
+  renderHistory();
+  renderChat();
+  finishManage();
+}
+
+function showDeleteChat() {
+  const chat = chats.get(managedChatId);
+  if (!chat) return;
+  $("manage-title").textContent = "Delete chat?";
+  $("delete-chat-description").textContent = "The messages in “" + chat.title + "” will be removed from this browser.";
+  $("rename-chat").hidden = true;
+  $("delete-chat").hidden = false;
+  $("cancel-delete-chat").focus();
+}
+
+function deleteChat(event) {
+  event.preventDefault();
+  const id = managedChatId;
+  try {
+    removeChat(id);
+    unsaved.delete(id);
+  } catch {
+    $("history-error").hidden = false;
+    $("history-error").textContent = "This chat could not be deleted from browser storage.";
+    finishManage();
+    return;
+  }
+  pending.get(id)?.controller.abort();
+  pending.delete(id);
+  drafts.delete(id);
+  chats.delete(id);
+  finishManage(false);
+  updateStorageStatus();
+  if (activeChatId === id) {
+    activeChatId = "";
+    if (state.view === "assistant") {
+      history.replaceState(null, "", chatRoute());
+      restoreDraft();
+      renderChat();
+    }
+  }
+  if (!chats.size) $("history-query").value = "";
+  renderHistory();
+  $("new-chat").focus();
 }
 
 function searchResult(root, data) {
@@ -296,50 +613,37 @@ function searchResult(root, data) {
   root.replaceChildren(heading, passageList(data.evidence));
 }
 
-async function submit(kind, event) {
+function postQuery(path, body, signal) {
+  return jsonRequest(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+}
+
+async function submitSearch(event) {
   event.preventDefault();
   const form = event.currentTarget;
-  const input = $(kind + "-question");
-  const question = input.value.trim();
-  if (question.length < 2) {
-    input.setCustomValidity("Enter at least two characters.");
-    input.reportValidity();
-    return;
-  }
+  const question = questionValue($("search-question"));
+  if (!question) return;
   const values = new FormData(form);
-  const topic = values.get("topic");
-  const body = { question, topic: topic || null };
-  if (kind === "search") {
-    body.mode = values.get("mode");
-    body.top_k = Number(values.get("top_k"));
-  }
-  state.requests[kind]?.abort();
+  const body = { question, topic: values.get("topic") || null, mode: values.get("mode"), top_k: Number(values.get("top_k")) };
+  state.searchRequest?.abort();
   const controller = new AbortController();
-  state.requests[kind] = controller;
+  state.searchRequest = controller;
 
-  const root = $(kind + "-output");
-  const button = $(kind + "-submit");
+  const root = $("search-output");
+  const button = $("search-submit");
   button.disabled = true;
   button.setAttribute("aria-busy", "true");
   root.hidden = false;
-  if (kind === "ask") {
-    $("assistant-hero").hidden = true;
-    $("suggestions").hidden = true;
-  }
   root.replaceChildren(message("Searching the documentation", "Finding passages in the indexed sources…", "loading"));
-  if (kind === "ask") window.scrollTo(0, 0);
   try {
-    const result = await jsonRequest("/" + kind, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-    if (state.requests[kind] !== controller) return;
-    if (kind === "ask") answerResult(root, result, question, topic);
-    else searchResult(root, result);
-  } catch (error) {
-    if (error.name === "AbortError" || state.requests[kind] !== controller) return;
+    const result = await postQuery("/search", body, controller.signal);
+    if (state.searchRequest === controller) searchResult(root, result);
+  } catch {
+    if (state.searchRequest !== controller) return;
     const failure = message("Couldn’t complete the request", "Check that the API is running, then try again.", "error");
     const retry = element("button", "link-button", "Try again");
     retry.type = "button";
@@ -347,8 +651,8 @@ async function submit(kind, event) {
     failure.lastElementChild.append(retry);
     root.replaceChildren(failure);
   } finally {
-    if (state.requests[kind] === controller) {
-      delete state.requests[kind];
+    if (state.searchRequest === controller) {
+      state.searchRequest = null;
       button.disabled = false;
       button.removeAttribute("aria-busy");
     }
@@ -422,10 +726,6 @@ async function loadLibrary() {
   if (state.view === "library") renderLibrary();
   try {
     state.sources = await jsonRequest("/sources");
-    for (const key of Object.keys(topics)) {
-      const count = state.sources.documents.filter((document) => document.topic === key).length;
-      document.querySelector('[data-count="' + key + '"]').textContent = count;
-    }
   } catch {
     state.libraryError = true;
   }
@@ -459,34 +759,50 @@ smallScreen.addEventListener("change", () => setMenu(false, false));
 $("menu-button").addEventListener("click", () => setMenu(true));
 $("sidebar-close").addEventListener("click", () => setMenu(false));
 $("sidebar-scrim").addEventListener("click", () => setMenu(false));
-$("new-question").addEventListener("click", resetAssistant);
+$("sidebar").addEventListener("click", (event) => {
+  if (event.target.closest("a")?.hash === location.hash && $("sidebar").classList.contains("is-open")) setMenu(false);
+});
+$("new-chat").addEventListener("click", newChat);
 $("help-open").addEventListener("click", () => {
   if (smallScreen.matches) setMenu(false);
   $("help-dialog").showModal();
 });
-$("ask-form").addEventListener("submit", (event) => submit("ask", event));
-$("search-form").addEventListener("submit", (event) => submit("search", event));
+$("ask-form").addEventListener("submit", submitChat);
+$("ask-stop").addEventListener("click", stopResponse);
+$("ask-question").addEventListener("input", preserveDraft);
+$("ask-topic").addEventListener("change", preserveDraft);
+$("search-form").addEventListener("submit", submitSearch);
+$("search-question").addEventListener("input", (event) => event.target.setCustomValidity(""));
 $("library-query").addEventListener("input", renderLibrary);
-for (const pair of ["ask", "search"]) {
-  $(pair + "-question").addEventListener("input", (event) => event.target.setCustomValidity(""));
-}
+$("history-query").addEventListener("input", renderHistory);
+$("rename-chat").addEventListener("submit", renameChat);
+$("chat-name").addEventListener("input", (event) => event.target.setCustomValidity(""));
+$("show-delete-chat").addEventListener("click", showDeleteChat);
+$("cancel-delete-chat").addEventListener("click", () => {
+  $("manage-title").textContent = "Rename chat";
+  $("delete-chat").hidden = true;
+  $("rename-chat").hidden = false;
+  $("show-delete-chat").focus();
+});
+$("delete-chat").addEventListener("submit", deleteChat);
 document.querySelectorAll("[data-question]").forEach((button) => {
   button.addEventListener("click", () => {
-    $("ask-question").setCustomValidity("");
     $("ask-question").value = button.dataset.question;
     $("ask-topic").value = "";
+    preserveDraft();
     $("ask-form").requestSubmit();
   });
 });
 $("ask-question").addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !$("ask-submit").disabled) {
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
     event.preventDefault();
-    $("ask-form").requestSubmit();
+    if (!$("ask-submit").disabled && !pending.has(activeChatId)) $("ask-form").requestSubmit();
   }
 });
 document.addEventListener("keydown", (event) => {
+  if (document.querySelector("dialog[open]")) return;
   if (event.key === "Escape" && $("sidebar").classList.contains("is-open")) setMenu(false);
-  if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey) && !$("help-dialog").open) {
+  if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
     event.preventDefault();
     if ($("sidebar").classList.contains("is-open")) setMenu(false, false);
     if (state.view === "assistant") $("ask-question").focus();
@@ -496,6 +812,7 @@ document.addEventListener("keydown", (event) => {
 });
 if (/Mac|iPhone|iPad/.test(navigator.platform)) $("focus-shortcut").textContent = "⌘ K";
 
+updateStorageStatus();
 navigate();
 loadHealth();
 loadLibrary();

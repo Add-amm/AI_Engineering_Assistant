@@ -34,6 +34,8 @@
     <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v5m0 3h.01"/></symbol>
   </svg>
@@ -51,8 +53,8 @@
           <svg class="icon"><use href="#i-x"/></svg>
         </button>
       </div>
-      <button type="button" class="new-question" id="new-question">
-        <svg class="icon"><use href="#i-plus"/></svg><span>New question</span>
+      <button type="button" class="new-chat" id="new-chat">
+        <svg class="icon"><use href="#i-plus"/></svg><span>New chat</span>
       </button>
 
       <nav class="workspace-nav" aria-label="Workspace">
@@ -68,21 +70,16 @@
         </a>
       </nav>
 
-      <nav class="topic-nav" aria-label="Documentation topics">
-        <p class="nav-label">Documentation</p>
-        <a class="topic-link" href="#library/python" data-topic="python">
-          <span class="topic-dot python"></span><span>Python</span><span class="topic-count" data-count="python"></span>
-        </a>
-        <a class="topic-link" href="#library/fastapi" data-topic="fastapi">
-          <span class="topic-dot fastapi"></span><span>FastAPI</span><span class="topic-count" data-count="fastapi"></span>
-        </a>
-        <a class="topic-link" href="#library/transformers" data-topic="transformers">
-          <span class="topic-dot transformers"></span><span>Transformers</span><span class="topic-count" data-count="transformers"></span>
-        </a>
-        <a class="topic-link" href="#library/rag" data-topic="rag">
-          <span class="topic-dot rag"></span><span>RAG &amp; retrieval</span><span class="topic-count" data-count="rag"></span>
-        </a>
-      </nav>
+      <section class="history-panel" aria-labelledby="history-title">
+        <h2 class="nav-label" id="history-title">Your chats</h2>
+        <div class="search-input history-search" id="history-search" hidden>
+          <svg class="icon"><use href="#i-search"/></svg>
+          <input id="history-query" type="search" placeholder="Find a chat…" aria-label="Find a chat">
+        </div>
+        <p class="history-empty" id="history-empty">Your conversations will appear here.</p>
+        <ul id="history-list" class="history-list"></ul>
+        <p class="history-error" id="history-error" role="status" hidden></p>
+      </section>
 
       <div class="sidebar-bottom">
         <button class="nav-link help-link" type="button" id="help-open">
@@ -111,70 +108,73 @@
       </header>
 
       <main class="main-content" id="main-content" tabindex="-1">
-        <section class="view" id="view-assistant" aria-label="Assistant">
-          <div class="hero" id="assistant-hero">
-            <img class="hero-art" src="/static/assets/hero.webp" alt="" width="1200" height="800" fetchpriority="high">
-            <div class="hero-content">
-              <h1>Answers you can<br><span>build on.</span></h1>
-              <p>Explore Python, FastAPI, Transformers, and RAG with answers grounded in official documentation.</p>
+        <section class="view assistant-view" id="view-assistant" aria-label="Assistant">
+          <div class="chat-scroll" id="chat-scroll" aria-label="Conversation">
+            <div class="chat-welcome" id="chat-welcome">
+              <div class="welcome-emblem" aria-hidden="true">
+                <img src="/static/assets/hero.webp" alt="" width="1200" height="800" fetchpriority="high">
+              </div>
+              <h1>What are you <span>building?</span></h1>
+              <p>Ask the official docs about Python, FastAPI, Transformers, and RAG.</p>
             </div>
+            <ol class="chat-thread" id="chat-thread" aria-label="Messages" aria-live="polite" hidden></ol>
           </div>
 
-          <form class="composer" id="ask-form">
-            <label class="composer-label" for="ask-question">
-              <svg class="icon"><use href="#i-sparkles"/></svg> Ask a question
-            </label>
-            <textarea id="ask-question" name="question" rows="2" maxlength="1000" placeholder="How do FastAPI dependencies work?" required minlength="2"></textarea>
-            <div class="composer-footer">
-              <div class="composer-tools">
-                <label class="select-shell">
-                  <svg class="icon"><use href="#i-filter"/></svg>
-                  <select aria-label="Filter assistant by topic" id="ask-topic" name="topic">
-                    <option value="">All topics</option>
-                    <option value="python">Python</option>
-                    <option value="fastapi">FastAPI</option>
-                    <option value="transformers">Transformers</option>
-                    <option value="rag">RAG &amp; retrieval</option>
-                  </select>
-                  <svg class="icon select-chevron"><use href="#i-chevron-down"/></svg>
-                </label>
-                <kbd id="focus-shortcut" title="Focus question field">Ctrl K</kbd>
+          <div class="chat-dock">
+            <form class="composer chat-composer" id="ask-form">
+              <label class="visually-hidden" for="ask-question">Message DocLens</label>
+              <textarea id="ask-question" name="question" rows="1" maxlength="1000" placeholder="Ask a question about the docs…" required minlength="2"></textarea>
+              <div class="composer-footer">
+                <div class="composer-tools">
+                  <label class="select-shell">
+                    <svg class="icon"><use href="#i-filter"/></svg>
+                    <select aria-label="Filter assistant by topic" id="ask-topic" name="topic">
+                      <option value="">All topics</option>
+                      <option value="python">Python</option>
+                      <option value="fastapi">FastAPI</option>
+                      <option value="transformers">Transformers</option>
+                      <option value="rag">RAG &amp; retrieval</option>
+                    </select>
+                    <svg class="icon select-chevron"><use href="#i-chevron-down"/></svg>
+                  </label>
+                  <kbd id="focus-shortcut" title="Focus the message field">Ctrl K</kbd>
+                </div>
+                <button class="primary-button send-button" id="ask-submit" type="submit" aria-label="Send message" title="Send message (Enter)">
+                  <svg class="icon"><use href="#i-arrow-up"/></svg>
+                </button>
+                <button class="primary-button send-button stop-button" id="ask-stop" type="button" aria-label="Stop response" title="Stop response" hidden>
+                  <svg class="icon"><use href="#i-stop"/></svg>
+                </button>
               </div>
-              <button class="primary-button" id="ask-submit" type="submit">
-                <span>Ask DocLens</span><svg class="icon"><use href="#i-arrow-up"/></svg>
-              </button>
-            </div>
-          </form>
+            </form>
 
-          <div id="ask-output" class="view-output" aria-live="polite" hidden></div>
-
-          <section class="suggestions" id="suggestions" aria-labelledby="suggestions-title">
-            <div class="section-header">
-              <h2 id="suggestions-title">Try a question</h2>
-            </div>
-            <div class="suggestion-grid">
-              <button class="suggestion-card" type="button" data-question="How do FastAPI dependencies work?">
-                <span class="topic-icon fastapi"><svg class="icon"><use href="#i-zap"/></svg></span>
-                <span class="suggestion-copy"><strong>How do FastAPI dependencies work?</strong><span>FastAPI</span></span>
-                <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
-              </button>
-              <button class="suggestion-card" type="button" data-question="How does AutoTokenizer prepare text for a model?">
-                <span class="topic-icon transformers"><svg class="icon"><use href="#i-sparkles"/></svg></span>
-                <span class="suggestion-copy"><strong>How does AutoTokenizer prepare text?</strong><span>Transformers</span></span>
-                <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
-              </button>
-              <button class="suggestion-card" type="button" data-question="What is the difference between a coroutine and a task?">
-                <span class="topic-icon python"><svg class="icon"><use href="#i-code"/></svg></span>
-                <span class="suggestion-copy"><strong>How do coroutines and tasks differ?</strong><span>Python</span></span>
-                <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
-              </button>
-              <button class="suggestion-card" type="button" data-question="How does retrieval-augmented generation work?">
-                <span class="topic-icon rag"><svg class="icon"><use href="#i-network"/></svg></span>
-                <span class="suggestion-copy"><strong>How does retrieval-augmented generation work?</strong><span>RAG &amp; retrieval</span></span>
-                <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
-              </button>
-            </div>
-          </section>
+            <section class="chat-starters" id="suggestions" aria-labelledby="suggestions-title">
+              <h2 class="visually-hidden" id="suggestions-title">Suggested questions</h2>
+              <div class="suggestion-grid">
+                <button class="suggestion-card" type="button" data-question="How do FastAPI dependencies work?">
+                  <span class="topic-icon fastapi"><svg class="icon"><use href="#i-zap"/></svg></span>
+                  <span class="suggestion-copy">How do FastAPI dependencies work?</span>
+                  <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
+                </button>
+                <button class="suggestion-card" type="button" data-question="How does AutoTokenizer prepare text for a model?">
+                  <span class="topic-icon transformers"><svg class="icon"><use href="#i-sparkles"/></svg></span>
+                  <span class="suggestion-copy">How does AutoTokenizer prepare text?</span>
+                  <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
+                </button>
+                <button class="suggestion-card" type="button" data-question="What is the difference between a coroutine and a task?">
+                  <span class="topic-icon python"><svg class="icon"><use href="#i-code"/></svg></span>
+                  <span class="suggestion-copy">How do coroutines and tasks differ?</span>
+                  <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
+                </button>
+                <button class="suggestion-card" type="button" data-question="How does retrieval-augmented generation work?">
+                  <span class="topic-icon rag"><svg class="icon"><use href="#i-network"/></svg></span>
+                  <span class="suggestion-copy">How does retrieval-augmented generation work?</span>
+                  <svg class="icon card-arrow"><use href="#i-arrow-up-right"/></svg>
+                </button>
+              </div>
+            </section>
+            <p class="chat-footer" id="chat-footer">Chats are saved in this browser.</p>
+          </div>
         </section>
 
         <section class="view" id="view-retrieval" aria-labelledby="retrieval-title" hidden>
@@ -283,7 +283,31 @@
       <li><strong>Retrieval lab</strong> runs keyword, vector, or combined search and shows the ranked passages.</li>
       <li><strong>Source library</strong> shows the document versions and licenses in the index.</li>
     </ul>
+    <p>Chat history lives in this browser. Recent messages provide context for follow-up questions.</p>
     <p class="dialog-mode" id="dialog-mode"></p>
+  </dialog>
+  <dialog class="help-dialog manage-dialog" id="manage-chat" aria-labelledby="manage-title">
+    <div class="dialog-heading">
+      <h2 id="manage-title">Rename chat</h2>
+      <form method="dialog">
+        <button class="icon-button" type="submit" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+      </form>
+    </div>
+    <form id="rename-chat">
+      <label for="chat-name">Chat name</label>
+      <input id="chat-name" name="name" type="text" maxlength="80" required>
+      <div class="dialog-actions">
+        <button class="danger-link" id="show-delete-chat" type="button">Delete chat</button>
+        <button class="primary-button" type="submit">Save name</button>
+      </div>
+    </form>
+    <form id="delete-chat" hidden>
+      <p id="delete-chat-description"></p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancel-delete-chat" type="button">Cancel</button>
+        <button class="danger-button" type="submit">Delete chat</button>
+      </div>
+    </form>
   </dialog>
 </body>
 </html>

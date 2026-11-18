@@ -126,13 +126,39 @@ class ApiTests(TestCase):
         self.assertTrue(result["abstained"])
         self.assertEqual(result["citations"], [])
 
+    def test_follow_up_uses_history_for_retrieval(self):
+        first_question = "How do FastAPI dependencies work?"
+        initial = self.client.post("/ask", json={"question": first_question}).json()
+        history = [{"question": first_question, "answer": initial["answer"]}]
+        contextual_question = "How do I use it with async functions?"
+        follow_up = self.client.post("/ask", json={"question": contextual_question, "history": history})
+        self.assertEqual(follow_up.status_code, 200)
+        answer = follow_up.json()
+        self.assertEqual(answer["retrieval_query"], first_question + "\n" + contextual_question)
+        self.assertFalse(answer["abstained"])
+        self.assertIn("fastapi-dependencies", {source["source_id"] for source in answer["citations"]})
+        self.assertIn("async", answer["answer"])
+
+        restatement = self.client.post("/ask", json={"question": "How does it work?", "history": history}).json()
+        self.assertEqual(restatement["retrieval_query"], first_question)
+        self.assertEqual(restatement["answer"], initial["answer"])
+
+        unrelated = "Will it rain in Paris tomorrow?"
+        response = self.client.post("/ask", json={"question": unrelated, "history": history}).json()
+        self.assertEqual(response["retrieval_query"], unrelated)
+        self.assertTrue(response["abstained"])
+
     def test_validation(self):
+        earlier = {"question": "Earlier question", "answer": "Earlier answer."}
         for body in ({"question": "   "}, {"question": "docs", "mode": "unknown"},
-                     {"question": "docs", "top_k": 20}, {"question": "x" * 1001}):
+                     {"question": "docs", "top_k": 20}, {"question": "x" * 1001},
+                     {"question": "docs", "history": [earlier] * 7},
+                     {"question": "docs", "history": [{**earlier, "answer": "x" * 2501}]}):
             self.assertEqual(self.client.post("/ask", json=body).status_code, 422)
 
     def test_provider_contract_and_fallback(self):
         question = "How do FastAPI dependencies work?"
+        history = [{"question": "What is FastAPI?", "answer": "A Python web framework."}]
         index = self.app.state.index
         hits = index.search(question)
         for provider in ("openai", "ollama"):
@@ -143,11 +169,12 @@ class ApiTests(TestCase):
                 payload = {"choices": [{"message": message}]} if provider == "openai" else {"message": message}
                 response = httpx.Response(200, json=payload, request=httpx.Request("POST", "https://test.invalid"))
                 with patch("doclens.generation.httpx.post", return_value=response) as post:
-                    answer = generator.answer(question, hits, index)
+                    answer = generator.answer(question, hits, index, history=history)
                 self.assertEqual(answer.numbers, (1,))
                 self.assertEqual(answer.mode, provider)
                 prompt = json.loads(post.call_args.kwargs["json"]["messages"][1]["content"])
                 self.assertEqual(prompt["question"], question)
+                self.assertEqual(prompt["history"], history)
                 self.assertEqual(prompt["evidence"][0]["text"], hits[0].chunk.text)
                 self.assertEqual(prompt["evidence"][0]["number"], 1)
                 message["content"] = json.dumps({"answer": "Unsupported claim. [999]", "abstained": False})

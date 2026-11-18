@@ -2,11 +2,11 @@
 
 DocLens is a documentation-grounded AI engineering assistant for Python, FastAPI, Transformers, and retrieval-augmented generation. It searches **39 pinned official documentation pages** and links citations to the exact source lines.
 
-![DocLens assistant workspace](reports/workspace.webp)
+![DocLens conversation workspace with saved chats](reports/workspace.webp)
 
 The web app has three views.
 
-- **Assistant** returns cited excerpts or a model-generated answer when configured. It abstains when its evidence is insufficient.
+- **Assistant** keeps follow-up questions and cited answers in a conversation. You can search, rename, and delete saved chats from the sidebar.
 - **Retrieval lab** compares BM25, dense search, reciprocal rank fusion, and reranking. Expand a passage to see its text, raw score, and source.
 - **Source library** browses the frozen documentation by topic, version, and license.
 
@@ -21,6 +21,8 @@ uv run --frozen uvicorn doclens.api:app --reload
 ```
 
 Open [the workspace](http://127.0.0.1:8000) and [the OpenAPI reference](http://127.0.0.1:8000/docs). Give Uvicorn `--host 0.0.0.0` when running in a container. FastAPI serves both the API and the frontend. The default install needs no Node build, network requests at runtime, model weights, or API key. The interface and the indexed documentation are in English.
+
+Chats are saved in this browser on the app's origin and persist after reload. Press Enter to send and Shift+Enter for a new line. Recent exchanges give follow-up questions context.
 
 ## How a question becomes an answer
 
@@ -56,7 +58,7 @@ Copy `.env.example` to `.env`, edit the relevant settings, and pass `--env-file 
 | `DOCLENS_RERANK_MODEL` / `DOCLENS_RERANK_REVISION` | Optional single-score cross-encoder ID or local directory and revision. |
 | `DOCLENS_LOCAL_MODELS_ONLY` | Set to `1` to load models from local paths or caches. |
 
-For Ollama, run your Ollama server and pull the configured model with `ollama pull qwen2.5:3b`. For a hosted endpoint, configure the appropriate model ID and key through the environment. The configured model receives the question and retrieved documentation.
+For Ollama, run your Ollama server and pull the configured model with `ollama pull qwen2.5:3b`. For a hosted endpoint, configure the appropriate model ID and key through the environment. The configured model receives the question, retrieved documentation, and up to six recent exchanges from the current chat.
 
 For neural retrieval, install the extra first. Use either a model cache or an environment that can reach Hugging Face.
 
@@ -75,7 +77,7 @@ When a generation backend fails to return a usable cited answer, the API reports
 | `GET /health` | Loaded corpus metrics, active embedding backend, and generation mode. |
 | `GET /sources` | Collections and documents with licenses and pinned revisions. |
 | `POST /search` | Ranked passages and elapsed time. |
-| `POST /ask` | Answer, citations, retrieved evidence, and abstention status. |
+| `POST /ask` | Answer, citations, retrieved evidence, abstention status, and the query used for retrieval. |
 
 ```sh
 curl -sS http://127.0.0.1:8000/ask \
@@ -84,6 +86,7 @@ curl -sS http://127.0.0.1:8000/ask \
 ```
 
 Both POST endpoints accept `mode` ( `bm25`, `dense`, `hybrid`, or `reranked` ), `top_k` from 1 to 12, and optional `topic`, `collection`, or `version` filters.
+The assistant endpoint also accepts optional `history` with up to six `{"question": "...", "answer": "..."}` objects in chronological order. Each answer in the history can contain up to 2,500 characters. The browser keeps the full transcript.
 
 ## Rebuild the corpus, run tests, and evaluate
 
