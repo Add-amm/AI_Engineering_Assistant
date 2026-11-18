@@ -1,0 +1,708 @@
+[
+  {
+    "id": "py-01",
+    "kind": "direct",
+    "question": "Why can a mutable default argument keep values from earlier Python calls?",
+    "reference_answer": "Defaults are evaluated once when the function is defined. Use None and make a new list in the function.",
+    "evidence": [
+      {
+        "source": "python-control-flow",
+        "anchor": "default value is evaluated only once"
+      }
+    ]
+  },
+  {
+    "id": "py-02",
+    "kind": "identifier",
+    "question": "What does the slash in a Python function signature mean?",
+    "reference_answer": "Parameters before / are positional-only and cannot be passed by keyword.",
+    "evidence": [
+      {
+        "source": "python-control-flow",
+        "anchor": "parameters cannot be passed by keyword"
+      }
+    ]
+  },
+  {
+    "id": "py-03",
+    "kind": "direct",
+    "question": "When does a finally block run in Python?",
+    "reference_answer": "It runs when control leaves the try statement, whether or not an exception has occurred.",
+    "evidence": [
+      {
+        "source": "python-errors",
+        "anchor": "clause runs whether or not the"
+      }
+    ]
+  },
+  {
+    "id": "py-04",
+    "kind": "direct",
+    "question": "How can I attach the cause when re-raising an exception as another type?",
+    "reference_answer": "Use raise RuntimeError from exc to chain the original exception as the direct cause.",
+    "evidence": [
+      {
+        "source": "python-errors",
+        "anchor": "raise RuntimeError from exc"
+      }
+    ]
+  },
+  {
+    "id": "py-05",
+    "kind": "synonym",
+    "question": "Does CPython check argument annotations while my program runs?",
+    "reference_answer": "Python does not enforce function and variable type annotations at runtime.",
+    "evidence": [
+      {
+        "source": "python-typing",
+        "anchor": "runtime does not enforce function and variable type annotations"
+      }
+    ]
+  },
+  {
+    "id": "py-06",
+    "kind": "identifier",
+    "question": "How do I make each dataclass instance receive its own list?",
+    "reference_answer": "Use field(default_factory=list) so a no-argument factory creates the default value per instance.",
+    "evidence": [
+      {
+        "source": "python-dataclasses",
+        "anchor": "field default_factory list"
+      }
+    ]
+  },
+  {
+    "id": "py-07",
+    "kind": "direct",
+    "question": "What happens if I call an async def coroutine without awaiting or scheduling it?",
+    "reference_answer": "Calling it returns a coroutine object without scheduling its execution.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "simply calling a coroutine will not schedule it"
+      }
+    ]
+  },
+  {
+    "id": "py-08",
+    "kind": "identifier",
+    "question": "What does asyncio.create_task do with a coroutine?",
+    "reference_answer": "It wraps a coroutine into a Task and schedules execution.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "wrap the coro coroutine into a task and schedule"
+      }
+    ]
+  },
+  {
+    "id": "py-09",
+    "kind": "identifier",
+    "question": "What happens to other tasks in an asyncio TaskGroup when one task raises?",
+    "reference_answer": "When one task fails with an exception other than CancelledError, remaining tasks in the group are cancelled.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "remaining tasks in the group are cancelled"
+      }
+    ]
+  },
+  {
+    "id": "py-10",
+    "kind": "identifier",
+    "question": "How can asyncio.to_thread run blocking I/O without blocking the event loop?",
+    "reference_answer": "Run the function in a separate thread and await its result.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "asynchronously run function func in a separate thread"
+      }
+    ]
+  },
+  {
+    "id": "py-11",
+    "kind": "direct",
+    "question": "What distinguishes a Python coroutine from an asyncio task?",
+    "reference_answer": "A coroutine can be awaited. A task schedules a coroutine to run concurrently.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "tasks are used to schedule coroutines concurrently"
+      }
+    ]
+  },
+  {
+    "id": "py-12",
+    "kind": "synonym",
+    "question": "How do I remove and return the final element of a Python list?",
+    "reference_answer": "list.pop() with no index removes and returns the last element.",
+    "evidence": [
+      {
+        "source": "python-data-structures",
+        "anchor": "removes and returns the last item in the list"
+      }
+    ]
+  },
+  {
+    "id": "py-13",
+    "kind": "identifier",
+    "question": "What does setting frozen=True do on a dataclass?",
+    "reference_answer": "Assigning to fields raises an exception, emulating a read-only instance.",
+    "evidence": [
+      {
+        "source": "python-dataclasses",
+        "anchor": "assigning to fields will generate an exception"
+      }
+    ]
+  },
+  {
+    "id": "py-14",
+    "kind": "identifier",
+    "question": "What happens if I call Future.result before a concurrent.futures task completes?",
+    "reference_answer": "It waits until completion or the supplied timeout, then raises TimeoutError on expiry.",
+    "evidence": [
+      {
+        "source": "python-futures",
+        "anchor": "wait up to timeout seconds"
+      }
+    ]
+  },
+  {
+    "id": "fa-01",
+    "kind": "direct",
+    "question": "How do FastAPI dependencies work?",
+    "reference_answer": "Declare a dependency for a path operation and FastAPI calls it and injects its result.",
+    "evidence": [
+      {
+        "source": "fastapi-dependencies",
+        "anchor": "take care of executing it and injecting the results"
+      }
+    ]
+  },
+  {
+    "id": "fa-02",
+    "kind": "identifier",
+    "question": "How do I use Depends to inject a function into a FastAPI route?",
+    "reference_answer": "Pass the dependency function to Depends without calling it. FastAPI calls it and supplies the result.",
+    "evidence": [
+      {
+        "source": "fastapi-dependencies",
+        "anchor": "you don't call it directly"
+      }
+    ]
+  },
+  {
+    "id": "fa-03",
+    "kind": "direct",
+    "question": "How do I require a FastAPI query parameter?",
+    "reference_answer": "Declare the query parameter without a default value.",
+    "evidence": [
+      {
+        "source": "fastapi-query-params",
+        "anchor": "make a query parameter required"
+      }
+    ]
+  },
+  {
+    "id": "fa-04",
+    "kind": "direct",
+    "question": "How does FastAPI distinguish a query parameter from a path parameter?",
+    "reference_answer": "Parameters found in the route template are path parameters; other scalar function parameters become query parameters.",
+    "evidence": [
+      {
+        "source": "fastapi-query-params",
+        "anchor": "not part of the path parameters"
+      }
+    ]
+  },
+  {
+    "id": "fa-05",
+    "kind": "direct",
+    "question": "How do I provide a JSON request body schema with FastAPI?",
+    "reference_answer": "Define a Pydantic BaseModel and use it as the path operation parameter type.",
+    "evidence": [
+      {
+        "source": "fastapi-request-body",
+        "anchor": "inherits from basemodel"
+      }
+    ]
+  },
+  {
+    "id": "fa-06",
+    "kind": "synonym",
+    "question": "FastAPI: Can I restrict a path segment to a known list of strings?",
+    "reference_answer": "Type the parameter with a Python Enum subclass whose values declare the allowed strings.",
+    "evidence": [
+      {
+        "source": "fastapi-path-params",
+        "anchor": "path parameter values to be predefined"
+      }
+    ]
+  },
+  {
+    "id": "fa-07",
+    "kind": "identifier",
+    "question": "How can I raise HTTPException to return a 404 from FastAPI?",
+    "reference_answer": "Raise an HTTPException with status_code=404 and optional detail.",
+    "evidence": [
+      {
+        "source": "fastapi-http-errors",
+        "anchor": "raise httpexception status_code 404"
+      }
+    ]
+  },
+  {
+    "id": "fa-08",
+    "kind": "identifier",
+    "question": "What type of data can I put in FastAPI HTTPException.detail?",
+    "reference_answer": "The detail value can be anything convertible to JSON, including dict or list.",
+    "evidence": [
+      {
+        "source": "fastapi-http-errors",
+        "anchor": "any value that can be converted to json"
+      }
+    ]
+  },
+  {
+    "id": "fa-09",
+    "kind": "identifier",
+    "question": "What is a FastAPI RequestValidationError?",
+    "reference_answer": "It is raised internally if a request contains invalid data and has a default handler.",
+    "evidence": [
+      {
+        "source": "fastapi-http-errors",
+        "anchor": "when a request contains invalid data"
+      }
+    ]
+  },
+  {
+    "id": "fa-10",
+    "kind": "direct",
+    "question": "How does a FastAPI response model keep private fields out of JSON?",
+    "reference_answer": "FastAPI filters output to the fields declared in the response model or return type.",
+    "evidence": [
+      {
+        "source": "fastapi-response-model",
+        "anchor": "limit and filter the output data"
+      }
+    ]
+  },
+  {
+    "id": "fa-11",
+    "kind": "identifier",
+    "question": "What does response_model_exclude_unset do?",
+    "reference_answer": "It skips fields that were not explicitly set on the model, even when defaults exist.",
+    "evidence": [
+      {
+        "source": "fastapi-response-model",
+        "anchor": "only the values actually set"
+      }
+    ]
+  },
+  {
+    "id": "fa-12",
+    "kind": "identifier",
+    "question": "How do I create a FastAPI TestClient for a synchronous test?",
+    "reference_answer": "Instantiate TestClient with the FastAPI app and call the resulting client's methods from normal def tests.",
+    "evidence": [
+      {
+        "source": "fastapi-testing",
+        "anchor": "create a testclient by passing"
+      }
+    ]
+  },
+  {
+    "id": "fa-13",
+    "kind": "direct",
+    "question": "How does FastAPI execute a route declared with plain def?",
+    "reference_answer": "A normal def path operation runs in an external thread pool and is awaited.",
+    "evidence": [
+      {
+        "source": "fastapi-async",
+        "anchor": "run in an external threadpool"
+      }
+    ]
+  },
+  {
+    "id": "fa-14",
+    "kind": "direct",
+    "question": "Which decorator registers a GET route in FastAPI?",
+    "reference_answer": "Use the app.get path operation decorator, for example @app.get(\"/\").",
+    "evidence": [
+      {
+        "source": "fastapi-first-steps",
+        "anchor": "app get"
+      }
+    ]
+  },
+  {
+    "id": "tr-01",
+    "kind": "identifier",
+    "question": "How does AutoTokenizer turn text into model inputs?",
+    "reference_answer": "Load the appropriate tokenizer with AutoTokenizer.from_pretrained and call it on text to produce numerical model inputs.",
+    "evidence": [
+      {
+        "source": "transformers-quicktour",
+        "anchor": "tokenize the text and return pytorch tensors"
+      }
+    ]
+  },
+  {
+    "id": "tr-02",
+    "kind": "direct",
+    "question": "Why do tokenizers pad or truncate input sequences?",
+    "reference_answer": "Padding makes variable-length sequences rectangular; truncation removes tokens beyond the configured maximum.",
+    "evidence": [
+      {
+        "source": "transformers-padding",
+        "anchor": "create rectangular tensors from batches of varying lengths"
+      }
+    ]
+  },
+  {
+    "id": "tr-03",
+    "kind": "identifier",
+    "question": "What does an attention_mask tell a transformer?",
+    "reference_answer": "It identifies tokens that should be attended to, such as non-padding tokens.",
+    "evidence": [
+      {
+        "source": "transformers-glossary",
+        "anchor": "which tokens should be attended to"
+      }
+    ]
+  },
+  {
+    "id": "tr-04",
+    "kind": "direct",
+    "question": "What token does greedy decoding select at each step?",
+    "reference_answer": "Greedy decoding chooses the single highest-probability next token.",
+    "evidence": [
+      {
+        "source": "transformers-generation",
+        "anchor": "selects the next most likely token at each step"
+      }
+    ]
+  },
+  {
+    "id": "tr-05",
+    "kind": "synonym",
+    "question": "Why might beam search produce a better sequence than choosing the locally best token?",
+    "reference_answer": "Beam search retains several hypotheses and chooses a sequence with a high overall probability.",
+    "evidence": [
+      {
+        "source": "transformers-generation",
+        "anchor": "keeps track of several generated sequences"
+      }
+    ]
+  },
+  {
+    "id": "tr-06",
+    "kind": "identifier",
+    "question": "How do I make generate sample rather than decode deterministically?",
+    "reference_answer": "Set do_sample=True when generating.",
+    "evidence": [
+      {
+        "source": "transformers-generation",
+        "anchor": "do_sample true"
+      }
+    ]
+  },
+  {
+    "id": "tr-07",
+    "kind": "direct",
+    "question": "Why can BERT use context on both sides of a token?",
+    "reference_answer": "It uses a bidirectional Transformer and masked-token pretraining, which sees left and right context.",
+    "evidence": [
+      {
+        "source": "transformers-bert",
+        "anchor": "text to the left and right"
+      }
+    ]
+  },
+  {
+    "id": "tr-08",
+    "kind": "direct",
+    "question": "What objective does GPT-2 use to learn text generation?",
+    "reference_answer": "GPT-2 is trained on a causal language-modeling objective, predicting the next word in a sequence.",
+    "evidence": [
+      {
+        "source": "transformers-gpt2",
+        "anchor": "predict the next word given all of the previous words"
+      }
+    ]
+  },
+  {
+    "id": "tr-09",
+    "kind": "identifier",
+    "question": "What is the Transformers pipeline API used for?",
+    "reference_answer": "The pipeline API wraps preprocessing, model inference and postprocessing for common tasks.",
+    "evidence": [
+      {
+        "source": "transformers-pipelines",
+        "anchor": "great and easy way to use models for inference"
+      }
+    ]
+  },
+  {
+    "id": "tr-10",
+    "kind": "synonym",
+    "question": "How can I adapt a large model without updating most of its parameters?",
+    "reference_answer": "PEFT freezes the base model and trains a small set of additional parameters, such as LoRA adapters.",
+    "evidence": [
+      {
+        "source": "transformers-peft",
+        "anchor": "only fine-tune a small number"
+      }
+    ]
+  },
+  {
+    "id": "tr-11",
+    "kind": "identifier",
+    "question": "What does setting load_in_8bit on BitsAndBytesConfig achieve?",
+    "reference_answer": "It loads a model in 8-bit precision to reduce memory use.",
+    "evidence": [
+      {
+        "source": "transformers-quantization",
+        "anchor": "halves the memory usage"
+      }
+    ]
+  },
+  {
+    "id": "tr-12",
+    "kind": "direct",
+    "question": "Why should I set max_new_tokens for LLM generation?",
+    "reference_answer": "It limits the number of newly generated tokens independent of the input sequence length.",
+    "evidence": [
+      {
+        "source": "transformers-llm",
+        "anchor": "to control the output length"
+      }
+    ]
+  },
+  {
+    "id": "rag-01",
+    "kind": "direct",
+    "question": "How does retrieval-augmented generation use external knowledge?",
+    "reference_answer": "A retriever returns relevant external knowledge at query time and the LLM receives it as context.",
+    "evidence": [
+      {
+        "source": "langchain-retrieval",
+        "anchor": "fetching relevant external knowledge at query time"
+      }
+    ]
+  },
+  {
+    "id": "rag-02",
+    "kind": "synonym",
+    "question": "How can matching a query by meaning help when it uses different words?",
+    "reference_answer": "Semantic search embeds queries and documents, and can match synonyms rather than exact words.",
+    "evidence": [
+      {
+        "source": "sentence-transformers-semantic-search",
+        "anchor": "given synonyms abbreviations and misspellings"
+      }
+    ]
+  },
+  {
+    "id": "rag-03",
+    "kind": "direct",
+    "question": "What does a text embedding represent in semantic search?",
+    "reference_answer": "It is a fixed-length vector representing the meaning of raw text.",
+    "evidence": [
+      {
+        "source": "langchain-embeddings",
+        "anchor": "fixed-length vector of numbers"
+      }
+    ]
+  },
+  {
+    "id": "rag-04",
+    "kind": "direct",
+    "question": "What does a vector store do with embeddings?",
+    "reference_answer": "A vector store persists embedded data and runs similarity search.",
+    "evidence": [
+      {
+        "source": "langchain-vector-stores",
+        "anchor": "performs similarity search"
+      }
+    ]
+  },
+  {
+    "id": "rag-05",
+    "kind": "identifier",
+    "question": "How does RecursiveCharacterTextSplitter choose where to split text?",
+    "reference_answer": "It tries separators in order recursively, splitting further to fit target size and keeping coherent units when possible.",
+    "evidence": [
+      {
+        "source": "langchain-knowledge-base",
+        "anchor": "recursively splits on common separators"
+      }
+    ]
+  },
+  {
+    "id": "rag-06",
+    "kind": "direct",
+    "question": "Why split documents before indexing them for retrieval?",
+    "reference_answer": "Splitting keeps passages within the model context and gives search more focused evidence than a whole page.",
+    "evidence": [
+      {
+        "source": "langchain-splitters",
+        "anchor": "fit within model context window limit"
+      }
+    ]
+  },
+  {
+    "id": "rag-07",
+    "kind": "direct",
+    "question": "What is the difference between a bi-encoder and cross-encoder in reranking?",
+    "reference_answer": "The bi-encoder embeds query and document independently. The cross-encoder scores a candidate jointly with the query.",
+    "evidence": [
+      {
+        "source": "sentence-transformers-rerank",
+        "anchor": "query and a possible document is passed simultaneously"
+      }
+    ]
+  },
+  {
+    "id": "rag-08",
+    "kind": "identifier",
+    "question": "When is dot product equivalent to cosine similarity in Sentence Transformers?",
+    "reference_answer": "Dot product is equivalent to cosine similarity when embeddings are normalized.",
+    "evidence": [
+      {
+        "source": "sentence-transformers-similarity",
+        "anchor": "dot product on normalized embeddings is equivalent"
+      }
+    ]
+  },
+  {
+    "id": "rag-09",
+    "kind": "identifier",
+    "question": "Which method from Sentence Transformers performs semantic search over small embedding collections?",
+    "reference_answer": "sentence_transformers.util.semantic_search matches query embeddings to corpus embeddings using cosine similarity by default.",
+    "evidence": [
+      {
+        "source": "sentence-transformers-semantic-search",
+        "anchor": "query_chunk_size"
+      }
+    ]
+  },
+  {
+    "id": "rag-10",
+    "kind": "direct",
+    "question": "What information can a LangChain Document metadata field store?",
+    "reference_answer": "It can store provenance, relationships, and other information about the passage.",
+    "evidence": [
+      {
+        "source": "langchain-knowledge-base",
+        "anchor": "metadata can capture the source of the document"
+      }
+    ]
+  },
+  {
+    "id": "cross-01",
+    "kind": "cross-source",
+    "question": "How can I expose Sentence Transformers semantic search as a FastAPI GET endpoint?",
+    "reference_answer": "Register a path operation with app.get. Encode the query, search the indexed document embeddings, and return the ranked passages.",
+    "evidence": [
+      {
+        "source": "fastapi-first-steps",
+        "anchor": "path operation decorator"
+      },
+      {
+        "source": "sentence-transformers-semantic-search",
+        "anchor": "given synonyms abbreviations and misspellings"
+      }
+    ]
+  },
+  {
+    "id": "cross-02",
+    "kind": "cross-source",
+    "question": "How can asyncio.to_thread help an async FastAPI endpoint that uses a blocking I/O library?",
+    "reference_answer": "Use async def for the path operation and await asyncio.to_thread for a synchronous I/O function, or use FastAPI's plain def thread pool.",
+    "evidence": [
+      {
+        "source": "python-asyncio",
+        "anchor": "asynchronously run function func in a separate thread"
+      },
+      {
+        "source": "fastapi-async",
+        "anchor": "run in an external threadpool"
+      }
+    ]
+  },
+  {
+    "id": "cross-03",
+    "kind": "cross-source",
+    "question": "How does adding retrieval context differ from training LoRA adapters?",
+    "reference_answer": "RAG supplies external text at query time. LoRA updates a small number of model parameters during adaptation.",
+    "evidence": [
+      {
+        "source": "langchain-retrieval",
+        "anchor": "fetching relevant external knowledge at query time"
+      },
+      {
+        "source": "transformers-peft",
+        "anchor": "only fine-tune a small number"
+      }
+    ]
+  },
+  {
+    "id": "cross-04",
+    "kind": "cross-source",
+    "question": "How do BERT and GPT-2 differ in how they use context during pretraining?",
+    "reference_answer": "BERT uses bidirectional masked-token predictions with left and right context. GPT-2 uses causal next-token prediction.",
+    "evidence": [
+      {
+        "source": "transformers-bert",
+        "anchor": "text to the left and right"
+      },
+      {
+        "source": "transformers-gpt2",
+        "anchor": "predict the next word given all of the previous words"
+      }
+    ]
+  },
+  {
+    "id": "out-01",
+    "kind": "unanswerable",
+    "question": "Will it rain in Paris tomorrow?",
+    "reference_answer": "The index contains static engineering documentation, not live weather predictions.",
+    "evidence": []
+  },
+  {
+    "id": "out-02",
+    "kind": "unanswerable",
+    "question": "Who won the 2022 football World Cup?",
+    "reference_answer": "The selected engineering documentation does not cover professional sports records.",
+    "evidence": []
+  },
+  {
+    "id": "out-03",
+    "kind": "unanswerable",
+    "question": "What are the best practices for PostgreSQL VACUUM?",
+    "reference_answer": "The corpus lacks official PostgreSQL maintenance documentation.",
+    "evidence": []
+  },
+  {
+    "id": "out-04",
+    "kind": "unanswerable",
+    "question": "How do I install and configure Celery Beat for scheduled Python tasks?",
+    "reference_answer": "The index lacks Celery operations documentation. asyncio scheduling does not establish Celery configuration.",
+    "evidence": []
+  },
+  {
+    "id": "out-05",
+    "kind": "unanswerable",
+    "question": "How do I export BERT to AWS Neuron and deploy it on Inferentia2?",
+    "reference_answer": "The selected docs do not document that deployment toolchain.",
+    "evidence": []
+  },
+  {
+    "id": "out-06",
+    "kind": "unanswerable",
+    "question": "What is the exact AWS Bedrock price per million tokens for Claude Opus in Tokyo today?",
+    "reference_answer": "Current regional billing data and that model's prices are outside this frozen corpus.",
+    "evidence": []
+  }
+]

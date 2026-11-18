@@ -1,0 +1,616 @@
+{
+  "retrieved_on": "2026-11-18",
+  "collections": [
+    {
+      "id": "python",
+      "topic": "python",
+      "title": "Python",
+      "description": "Python programming language reference and tutorial.",
+      "repository": "python/cpython",
+      "version": "3.13.2",
+      "revision": "4f8bb3947cfbc20f970ff9d9531e1132a9e95396",
+      "license": "PSF-2.0",
+      "license_path": "LICENSE",
+      "license_sha256": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb"
+    },
+    {
+      "id": "fastapi",
+      "topic": "fastapi",
+      "title": "FastAPI",
+      "description": "Routing, validation, dependencies and testing.",
+      "repository": "fastapi/fastapi",
+      "version": "0.115.12",
+      "revision": "628c34e0cae200564d191c95d7edea78c88c4b5e",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "license_sha256": "4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e"
+    },
+    {
+      "id": "transformers",
+      "topic": "transformers",
+      "title": "Transformers",
+      "description": "Tokenization, inference and model adaptation.",
+      "repository": "huggingface/transformers",
+      "version": "4.51.3",
+      "revision": "5f4ecf2d9f867a1255131d2461d75793c0cf1db2",
+      "license": "Apache-2.0",
+      "license_path": "LICENSE",
+      "license_sha256": "77fd4710def9ec3c0f6225800e0235f15a425abd4a8b03559127fcd782612049"
+    },
+    {
+      "id": "langchain",
+      "topic": "rag",
+      "title": "LangChain",
+      "description": "Retrieval, chunking, embeddings and vector stores.",
+      "repository": "langchain-ai/docs",
+      "version": "2026-11 snapshot",
+      "revision": "96a94d110402cbda3f5dcf0ae40c94470c77026f",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "license_sha256": "98af1351ea856e008c835bc89a312905960a318072f950732bf346c741027c7d"
+    },
+    {
+      "id": "sentence-transformers",
+      "topic": "rag",
+      "title": "Sentence Transformers",
+      "description": "Sentence embeddings, semantic search and reranking.",
+      "repository": "huggingface/sentence-transformers",
+      "version": "4.1.0",
+      "revision": "aa4453bed01a6537d30191ab851a42d6042c062a",
+      "license": "Apache-2.0",
+      "license_path": "LICENSE",
+      "license_sha256": "624b030fd62b8b989dd502d5bb6322cbc0dbb524ab9c9708f32efe33d7275735"
+    }
+  ],
+  "documents": [
+    {
+      "id": "python-control-flow",
+      "collection": "python",
+      "title": "Control flow and functions",
+      "path": "Doc/tutorial/controlflow.rst",
+      "url": "https://docs.python.org/3.13/tutorial/controlflow.html",
+      "sha256": "1e589edc233e3654a8a64073e1cce668304453c1d64e163955df8e08dec73f66"
+    },
+    {
+      "id": "python-data-structures",
+      "collection": "python",
+      "title": "Data structures",
+      "path": "Doc/tutorial/datastructures.rst",
+      "url": "https://docs.python.org/3.13/tutorial/datastructures.html",
+      "sha256": "c83633cfaa116c223eb4eacaf454f444591257f5340bae4f741726335029cf48"
+    },
+    {
+      "id": "python-errors",
+      "collection": "python",
+      "title": "Errors and exceptions",
+      "path": "Doc/tutorial/errors.rst",
+      "url": "https://docs.python.org/3.13/tutorial/errors.html",
+      "sha256": "77b6fbae30c5ab25d00efd089737bde813bda9a789606f8b1cff26856dc3d711"
+    },
+    {
+      "id": "python-classes",
+      "collection": "python",
+      "title": "Classes",
+      "path": "Doc/tutorial/classes.rst",
+      "url": "https://docs.python.org/3.13/tutorial/classes.html",
+      "sha256": "fd28b82a81acda33c4997dc931ab63d5a4fea4ef65d820b579dcf2d4bf7304a4"
+    },
+    {
+      "id": "python-modules",
+      "collection": "python",
+      "title": "Modules and packages",
+      "path": "Doc/tutorial/modules.rst",
+      "url": "https://docs.python.org/3.13/tutorial/modules.html",
+      "sha256": "5103a4f1a7571e79382299c36e77fddaffc6744c232616438f8678e123aaac03"
+    },
+    {
+      "id": "python-asyncio",
+      "collection": "python",
+      "title": "Coroutines and tasks",
+      "path": "Doc/library/asyncio-task.rst",
+      "url": "https://docs.python.org/3.13/library/asyncio-task.html",
+      "sha256": "5c12e0501aeeb698944c81be9c8d96dbe498440f8b2b34bef0ec3620b8842c8c"
+    },
+    {
+      "id": "python-typing",
+      "collection": "python",
+      "title": "Type hints",
+      "path": "Doc/library/typing.rst",
+      "url": "https://docs.python.org/3.13/library/typing.html",
+      "sha256": "dd068079d5949086bf88b28432792e85e9dfaa27ab08f65abbc3dd75f328a9fe"
+    },
+    {
+      "id": "python-dataclasses",
+      "collection": "python",
+      "title": "Data classes",
+      "path": "Doc/library/dataclasses.rst",
+      "url": "https://docs.python.org/3.13/library/dataclasses.html",
+      "sha256": "4939498e58fbf1d346e8d89a1d44d1264d818a9648eb2714e3762ec0e9a77c23"
+    },
+    {
+      "id": "python-futures",
+      "collection": "python",
+      "title": "Concurrent futures",
+      "path": "Doc/library/concurrent.futures.rst",
+      "url": "https://docs.python.org/3.13/library/concurrent.futures.html",
+      "sha256": "b2dd50b0e03ae848850d8ab396d3a06b52081366acdb0035e44e9bf585d7e5ba"
+    },
+    {
+      "id": "fastapi-first-steps",
+      "collection": "fastapi",
+      "title": "First steps",
+      "path": "docs/en/docs/tutorial/first-steps.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/first-steps/",
+      "sha256": "7466b302eeb012e6af9d04f2290a285d70a149edd5dde831c551a4c5290123d9"
+    },
+    {
+      "id": "fastapi-path-params",
+      "collection": "fastapi",
+      "title": "Path parameters",
+      "path": "docs/en/docs/tutorial/path-params.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/path-params/",
+      "sha256": "4782a7e3a01d43cab8f32940eda3dda90b8674483f14319960d011f15b04ad88"
+    },
+    {
+      "id": "fastapi-query-params",
+      "collection": "fastapi",
+      "title": "Query parameters",
+      "path": "docs/en/docs/tutorial/query-params.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/query-params/",
+      "sha256": "6a9834004e61bc70c47616c85e0100b39ee6636e34eda6510f0a523b77b6d346"
+    },
+    {
+      "id": "fastapi-request-body",
+      "collection": "fastapi",
+      "title": "Request body",
+      "path": "docs/en/docs/tutorial/body.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/body/",
+      "sha256": "8fff9beac72883a7c97eecdc48f68efdb7f54af049bfabbbf608df1735467939"
+    },
+    {
+      "id": "fastapi-response-model",
+      "collection": "fastapi",
+      "title": "Response model",
+      "path": "docs/en/docs/tutorial/response-model.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/response-model/",
+      "sha256": "777a733cad2a94bc6202157a37615fedc39d9811a44751cb566cbb051d017058"
+    },
+    {
+      "id": "fastapi-http-errors",
+      "collection": "fastapi",
+      "title": "Handling errors",
+      "path": "docs/en/docs/tutorial/handling-errors.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+      "sha256": "1c626c19fc9b6d62003f48a9eb9c6d9b73b0aec0acfffde9f4ba193ad82357dd"
+    },
+    {
+      "id": "fastapi-dependencies",
+      "collection": "fastapi",
+      "title": "Dependencies",
+      "path": "docs/en/docs/tutorial/dependencies/index.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/dependencies/",
+      "sha256": "b80917a2c384e27c67c0b23b5a3144ecd281cb97ce8bf5da2e40d0257a2932be"
+    },
+    {
+      "id": "fastapi-async",
+      "collection": "fastapi",
+      "title": "Concurrency and async / await",
+      "path": "docs/en/docs/async.md",
+      "url": "https://fastapi.tiangolo.com/async/",
+      "sha256": "950ab6c56f84d94c97a344ba622d33046ef8b3ca050d6918b2de0d92c6672604"
+    },
+    {
+      "id": "fastapi-testing",
+      "collection": "fastapi",
+      "title": "Testing",
+      "path": "docs/en/docs/tutorial/testing.md",
+      "url": "https://fastapi.tiangolo.com/tutorial/testing/",
+      "sha256": "d96bd1218dad4d982cd7b1f81ddc5f804188fcf42f081d08c0f032e12979ac7e"
+    },
+    {
+      "id": "transformers-quicktour",
+      "collection": "transformers",
+      "title": "Transformers quick tour",
+      "path": "docs/source/en/quicktour.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/quicktour",
+      "sha256": "8620bf3afcc3f399788ebb087bb00d518c889a5bcedc53d964782f1e131af973"
+    },
+    {
+      "id": "transformers-tokenizer",
+      "collection": "transformers",
+      "title": "Tokenizer",
+      "path": "docs/source/en/main_classes/tokenizer.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/main_classes/tokenizer",
+      "sha256": "86ff940a42473b1d65622864465ebed9d7a0a3f8c15390ed176da3440b21ebf5"
+    },
+    {
+      "id": "transformers-pipelines",
+      "collection": "transformers",
+      "title": "Pipelines for inference",
+      "path": "docs/source/en/main_classes/pipelines.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/main_classes/pipelines",
+      "sha256": "315ad6a184ecb66c621d7a75b81f2b6dced60df0c000b71c76c6b0fa769a6c84"
+    },
+    {
+      "id": "transformers-generation",
+      "collection": "transformers",
+      "title": "Generation strategies",
+      "path": "docs/source/en/generation_strategies.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/generation_strategies",
+      "sha256": "246d403f5dd8eadb90a1e048872d9c8e1ab4fc93327d01ed3e94a22ca53ce40a"
+    },
+    {
+      "id": "transformers-llm",
+      "collection": "transformers",
+      "title": "Text generation with LLMs",
+      "path": "docs/source/en/llm_tutorial.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/llm_tutorial",
+      "sha256": "cfe4949f7b58e8ee5388a4bf0eabe1a3fcf9dfaadbb946476ad7a453cbfdb9a0"
+    },
+    {
+      "id": "transformers-bert",
+      "collection": "transformers",
+      "title": "BERT",
+      "path": "docs/source/en/model_doc/bert.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/model_doc/bert",
+      "sha256": "23e50462e8c706278812de361decef3068cf6cf5f40feca03ec88901a9ec30f1"
+    },
+    {
+      "id": "transformers-gpt2",
+      "collection": "transformers",
+      "title": "GPT-2",
+      "path": "docs/source/en/model_doc/gpt2.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/model_doc/gpt2",
+      "sha256": "78583c0ee297c8d95458ed61a72b02c409289c6d9ee729e66f09ccb2eb77db77"
+    },
+    {
+      "id": "transformers-peft",
+      "collection": "transformers",
+      "title": "Parameter-efficient fine-tuning",
+      "path": "docs/source/en/peft.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/peft",
+      "sha256": "b40e765f871c57839133b1e496ef3ec3f6c9800f484ca2d0b151c782e8198508"
+    },
+    {
+      "id": "transformers-quantization",
+      "collection": "transformers",
+      "title": "Bitsandbytes quantization",
+      "path": "docs/source/en/quantization/bitsandbytes.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/quantization/bitsandbytes",
+      "sha256": "c406edd359218758e0274ca675ca94b49ed6dd55a10ef350215988b35ec1060e"
+    },
+    {
+      "id": "transformers-fast-tokenizers",
+      "collection": "transformers",
+      "title": "Fast tokenizers",
+      "path": "docs/source/en/fast_tokenizers.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/fast_tokenizers",
+      "sha256": "b43cd0a1c3538a370e1da743f027ea0285106e58b6b0a4208b9e36f246c8e99d"
+    },
+    {
+      "id": "transformers-padding",
+      "collection": "transformers",
+      "title": "Padding and truncation",
+      "path": "docs/source/en/pad_truncation.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/pad_truncation",
+      "sha256": "ea9dc7d993dbafb3574d12b3bf87bcdc66c6318e8f38e155ed7ded5628d5dbda"
+    },
+    {
+      "id": "transformers-glossary",
+      "collection": "transformers",
+      "title": "Transformers glossary",
+      "path": "docs/source/en/glossary.md",
+      "url": "https://huggingface.co/docs/transformers/v4.51.3/en/glossary",
+      "sha256": "7ae502e70fb76f7b51b988b1c29876458b44a4d495d2600e126b3deeca74d935"
+    },
+    {
+      "id": "langchain-retrieval",
+      "collection": "langchain",
+      "title": "Retrieval and RAG",
+      "path": "src/oss/deepagents/retrieval.mdx",
+      "url": "https://docs.langchain.com/oss/python/deepagents/retrieval",
+      "sha256": "41a873236179feb7fca1bda17651f382449e41cfe22957e07c2c6f743e8e4a04"
+    },
+    {
+      "id": "langchain-knowledge-base",
+      "collection": "langchain",
+      "title": "Build a semantic search engine",
+      "path": "src/oss/langchain/knowledge-base.mdx",
+      "url": "https://docs.langchain.com/oss/python/langchain/knowledge-base",
+      "sha256": "3e6a49fa2a47113b3a717d21150ffb3ecbb2f4b49e61cc1ed3770fe33d69bd8d"
+    },
+    {
+      "id": "langchain-splitters",
+      "collection": "langchain",
+      "title": "Text splitter integrations",
+      "path": "src/oss/integrations/splitters/index.mdx",
+      "url": "https://docs.langchain.com/oss/python/integrations/splitters",
+      "sha256": "e162047420a917b62e5770c407e97de193edbe6918c98db256ce3d6cdcd3b800"
+    },
+    {
+      "id": "langchain-vector-stores",
+      "collection": "langchain",
+      "title": "Vector store integrations",
+      "path": "src/oss/python/integrations/vectorstores/index.mdx",
+      "url": "https://docs.langchain.com/oss/python/integrations/vectorstores",
+      "sha256": "e34750a283deee7642985e9419300e71e4795d2bad31db6b5eba10b649c41bdd"
+    },
+    {
+      "id": "langchain-embeddings",
+      "collection": "langchain",
+      "title": "Embedding model integrations",
+      "path": "src/oss/python/integrations/embeddings/index.mdx",
+      "url": "https://docs.langchain.com/oss/python/integrations/embeddings",
+      "sha256": "d2e6251f7349d9c437f6486f040ca31e1361dadb51e2701346686b43b2a6afc7"
+    },
+    {
+      "id": "langchain-retrievers",
+      "collection": "langchain",
+      "title": "Retriever integrations",
+      "path": "src/oss/python/integrations/retrievers/index.mdx",
+      "url": "https://docs.langchain.com/oss/python/integrations/retrievers",
+      "sha256": "826c4d6eff2a514248a2b6f8cc19ff0efe9abedef9a68c27c9c1c5eb1ea37ac8"
+    },
+    {
+      "id": "sentence-transformers-semantic-search",
+      "collection": "sentence-transformers",
+      "title": "Semantic search",
+      "path": "examples/sentence_transformer/applications/semantic-search/README.md",
+      "url": "https://sbert.net/examples/sentence_transformer/applications/semantic-search/README.html",
+      "sha256": "59bd139098e009f36aa3bd7a40a3c8ddeb5f2b73d06342949d3fc8a9ba6cf61a"
+    },
+    {
+      "id": "sentence-transformers-rerank",
+      "collection": "sentence-transformers",
+      "title": "Retrieve and rerank",
+      "path": "examples/sentence_transformer/applications/retrieve_rerank/README.md",
+      "url": "https://sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html",
+      "sha256": "213d2167fd158e85c164b2e04975af5b141e0296ab259f91cd714cdbd49655ac"
+    },
+    {
+      "id": "sentence-transformers-similarity",
+      "collection": "sentence-transformers",
+      "title": "Semantic textual similarity",
+      "path": "docs/sentence_transformer/usage/semantic_textual_similarity.rst",
+      "url": "https://sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html",
+      "sha256": "7993ff021db8bb39c0e9049df740cf6d48e8140c65c59053ca9dcf64d2d65848"
+    }
+  ],
+  "examples": [
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b/main.py",
+      "sha256": "e9ae2a02745e4f4a6f16692502b3788e93b67a7073790c5c56f940d5bb00c899"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b/test_main.py",
+      "sha256": "0983f6ade01f3eee326f77e6c160deb437a67f3907880ee35c68eee5348aa08c"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b_an/main.py",
+      "sha256": "6eb2c38cc49ee31a43104725182cdad1cbfb8db634fdb39f19ba71c7c5e24dbd"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b_an_py310/main.py",
+      "sha256": "67590e752b75d65fb277315b482e168eaa2d7643bedf74fe0386a86d86fa0c0c"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b_an_py39/main.py",
+      "sha256": "f50008c6ff47da6d48767916216a6a762d4a4c0cbfe75d6441147b645160faed"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/app_b_py310/main.py",
+      "sha256": "02c0844c5a9a11ac790c47f92f95c44f5e2903c72ab9079afdbf5bfc10e2d111"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/main.py",
+      "sha256": "799a66ca241638380ba6e08101ed0da161b8635b4938b46fe30beb3694cb8ab0"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/test_main.py",
+      "sha256": "e7206e066c05dfff12979153ccefe474986f5fc8ca2a55c3e2738ad6ef788af2"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/app_testing/tutorial001.py",
+      "sha256": "193b66240f88d01a65bb1bddc43dc1a36cd13b5c43e50a226decfc4f1c0cd775"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/body/tutorial001_py310.py",
+      "sha256": "e481030f5b9ceaddc5e1ab2cd7bb36ef415799d457e54fa89f58b93510166a3a"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/body/tutorial002_py310.py",
+      "sha256": "71db4a39efc5397590011ea1e8409a7760ba1a7a8d17a0763d60c9d695849fd1"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/body/tutorial003_py310.py",
+      "sha256": "af21d8ede3844d1756e51f38dcb3fec485e9134ece80ff12927f5de2226f62a7"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/body/tutorial004_py310.py",
+      "sha256": "293f9e2dae1a7f9ec39381eb4dcea85da7ca0aaea943acd390440cbefd7ca00f"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/dependencies/tutorial001_02_an_py310.py",
+      "sha256": "823aea3f4777d1b4bcc13c946ecff73a85b895766dc503d6a0a2f9eb1ff88583"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/dependencies/tutorial001_an_py310.py",
+      "sha256": "d86dfe481e6e8fc1a90a5be496102bd260c514c73599a7a4655a538a1c7e6647"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/first_steps/tutorial001.py",
+      "sha256": "88c744bf8154cc2a96793f9df1058431588029f7422ee0bcb62b74130a801650"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/first_steps/tutorial003.py",
+      "sha256": "b0ba3b1d47204510640516d3808558eb6fa65f15cc027dd86db2e236eea57375"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial001.py",
+      "sha256": "ae11c344b30574d3ef126de0d05a96b6c9d2466fc7c566e4e8bf989704807b5c"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial002.py",
+      "sha256": "c022ef435507bef0a0dcb8c889b8c1a9d0abf48da9b83cb5f626ac5c9c3fd38d"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial003.py",
+      "sha256": "6d9cc868c5b98d899b1e199a7ee4ad0f0e914a56a6b265e88e635c05afb9e722"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial004.py",
+      "sha256": "8f8e310c110f97d855cd2fa7aed634a6fd5d69f28cd952d2b6180a5754a49b00"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial005.py",
+      "sha256": "61824da4694a1099574a666fe6034cb70d8551c897b362ba2703f3b27fa3e8fc"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/handling_errors/tutorial006.py",
+      "sha256": "ce86939ebe2b508226de8f01d760dd8e0c34ed6238b526306257c49eb274aa01"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial001.py",
+      "sha256": "c10c9be93c07a592e1bc473ff53027152459d6565043d9fef5548089752fd0e2"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial002.py",
+      "sha256": "e315342e8a391de45042201b39fd985c65f9107559581e2516b06f97e433e0f4"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial003.py",
+      "sha256": "8e61b9cf938034484ada46a920f68e7ac54e28e9fc1b5305e591cd88247bdca2"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial003b.py",
+      "sha256": "f53e4f4f236d1f95ddfe9ae853ec2a99e2209b890946ba73044d6fc5eaebb056"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial004.py",
+      "sha256": "7d51acce2e571de480e402ae7cc1f3e383e3751f4a661becddd0001c0469fd71"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/path_params/tutorial005.py",
+      "sha256": "1c68f2c5549486ef0da4c198e5068e0a25227b0e87e53237aba9bd89b3ce6de8"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial001.py",
+      "sha256": "6adfaedf0f557cb2ebe4b75b805c7f6c783c61e50845572f4020e888dac69489"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial002_py310.py",
+      "sha256": "17d2182e85ea040919e7b965c428147f30a203f9c7d6e9d1da0bd55ae502f88b"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial003_py310.py",
+      "sha256": "a2db585926ed6c203565561ae8e1bbf74b5e27d78cf50a2c58f139085957e2d8"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial004_py310.py",
+      "sha256": "105c31a085865fd99bb5336c5e0168dbced8eed9ddf0f37f89cdfe5e8a657697"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial005.py",
+      "sha256": "c532cc66d7a9b90cf79773b7fcbdbe306a88353aac72bc72ffd7bc990d91c25f"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/query_params/tutorial006_py310.py",
+      "sha256": "d39ad4b41b19a6af1528e46eccac3c149d6128e98a2cb935575cf85142c10c9a"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial001_01_py310.py",
+      "sha256": "1c543fb76ad6bff0a424fbbdd94e185cb43949970d39aaede0b44d5f5ff57d7e"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial001_py310.py",
+      "sha256": "780e13196289168227c3a5b59c063e9637e796c7285347c4d875a5c956f3f599"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial002_py310.py",
+      "sha256": "a370d1428ffcd8a85bb6a7c0ebb9df03b59389a556723319fdcd051963e64895"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_01_py310.py",
+      "sha256": "b42cde7525d1b1877c67fba8a1b99fc68bdc452dbd1a1e5835ed36bc20168ed7"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_02.py",
+      "sha256": "2714bf1aaee30d7e73c0e5855d5154079b9bdf39ef13d93800f111370cd2853b"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_03.py",
+      "sha256": "a7da6882c20c39f6533c4f926463babc652343a4fe6f54ed9d27cbc36f06faca"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_04_py310.py",
+      "sha256": "b2ef95cbeda4aa9e48bfe1e980c3fb0d3329090a72b8dc4865abd38be4b6f05c"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_05_py310.py",
+      "sha256": "ebf21a204c0000a19c556b5ec36bb1078f3faed2a245fcf6c5fe453b3ceb50b0"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial003_py310.py",
+      "sha256": "f0f863999159135b89dcbbc063e57e1c3c693e53c5cae2cfb0f540873525f3ec"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial004_py310.py",
+      "sha256": "5903bb91bb7c84654e2fda58b13b443df4a6fd1fce9cd3e8c62e6f62a88ac9a1"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial005_py310.py",
+      "sha256": "280e9186c9284cb4155551c05b76c03117e2a2bee4cdffd519d075137f548bb1"
+    },
+    {
+      "collection": "fastapi",
+      "path": "docs_src/response_model/tutorial006_py310.py",
+      "sha256": "8783dd5c462cda961ea0b2f6ed6d3aaac6ca66b6441c5ad3e091c108d9e1cbcd"
+    }
+  ]
+}

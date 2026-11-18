@@ -1,0 +1,6 @@
+# Upstream snapshots are verified byte for byte.
+corpus/raw/** -text whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+corpus/examples/** -text whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+corpus/licenses/** -text whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+# This upstream RST file contains a seven-character heading underline.
+corpus/raw/python-typing.rst conflict-marker-size=80
